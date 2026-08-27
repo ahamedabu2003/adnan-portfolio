@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IAbout extends Document {
+  name?: string;
   title: string;
   description: string;
   image?: string;
@@ -10,6 +11,7 @@ export interface IAbout extends Document {
 
 const AboutSchema = new Schema<IAbout>(
   {
+    name: { type: String },
     title: { type: String, required: true },
     description: { type: String, required: true },
     image: { type: String },

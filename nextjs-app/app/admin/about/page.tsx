@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 
 interface About {
+  name?: string;
   title: string;
   description: string;
   image?: string;
@@ -13,17 +14,19 @@ export default function AdminAbout() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [msg, setMsg] = useState({ type: '', text: '' });
 
   useEffect(() => {
-    fetch('/app/../api/admin/about')
+    fetch('/api/admin/about')
       .then((res) => res.json())
       .then((data) => {
         if (data) {
           setAbout(data);
+          setName(data.name || '');
           setTitle(data.title || '');
           setDescription(data.description || '');
           setImage(data.image || '');
@@ -52,12 +55,12 @@ export default function AdminAbout() {
       const res = await fetch('/api/admin/about', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, image: imageUrl }),
+        body: JSON.stringify({ name, title, description, image: imageUrl }),
       });
       const data = await res.json();
       if (data.success) {
         setMsg({ type: 'success', text: 'About section updated successfully.' });
-        setAbout({ title, description, image: imageUrl });
+        setAbout({ name, title, description, image: imageUrl });
         setImage(imageUrl);
       } else {
         setMsg({ type: 'error', text: data.error || 'Failed to update' });
@@ -111,6 +114,14 @@ export default function AdminAbout() {
 
           {/* Right: Inputs */}
           <div className="md:col-span-2 space-y-6">
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">Your Full Name</label>
+              <input
+                type="text" value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg text-sm border border-white/10 bg-[#112e42] text-white focus:outline-none focus:border-[#00abf0] focus:ring-1 focus:ring-[#00abf0]/30 transition-all"
+                placeholder="E.g. Ahamed Aboo Adnan"
+              />
+            </div>
             <div>
               <label className="block text-xs uppercase tracking-widest text-slate-400 mb-2">Display Title</label>
               <input

@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   description: 'Portfolio of Ahamed Aboo Adnan — Backend Developer, Laravel Specialist & API Architect.',
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HomePage() {
   let data = { about: null, experiences: [], projects: [], skills: [], cv: null };
 

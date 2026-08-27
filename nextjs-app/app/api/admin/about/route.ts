@@ -12,14 +12,14 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { title, description, image } = body;
+    const { name, title, description, image } = body;
     if (!title || !description) return NextResponse.json({ error: 'Title and description required' }, { status: 400 });
     const existing = await About.findOne();
     if (existing) {
-      await About.findByIdAndUpdate(existing._id, { title, description, image });
+      await About.findByIdAndUpdate(existing._id, { name, title, description, image });
       return NextResponse.json({ success: true, message: 'About updated' });
     }
-    await About.create({ title, description, image });
+    await About.create({ name, title, description, image });
     return NextResponse.json({ success: true, message: 'About created' });
   } catch (e) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

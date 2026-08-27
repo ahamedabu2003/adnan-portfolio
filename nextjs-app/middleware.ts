@@ -4,5 +4,10 @@ import { authConfig } from './auth.config';
 export default NextAuth(authConfig).auth;
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Run middleware on admin pages AND admin API routes (but skip static assets, nextauth, and public API)
+  matcher: [
+    '/admin/:path*',
+    '/api/admin/:path*',
+    '/((?!api/auth|api/contact|_next/static|_next/image|favicon.ico|uploads).*)',
+  ],
 };

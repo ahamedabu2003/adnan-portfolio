@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Script from 'next/script';
 
-interface About { _id: string; title: string; description: string; image?: string; }
+interface About { _id: string; name?: string; title: string; description: string; image?: string; }
 interface Experience { _id: string; company: string; designation: string; duration: string; description: string; }
 interface Project { _id: string; title: string; description: string; technology: string; image?: string; github_link?: string; live_link?: string; }
 interface Skill { _id: string; name: string; percentage: number; }
@@ -73,6 +73,270 @@ export default function HomeClient({ about, experiences, projects, skills, cv }:
   const allScriptsReady = () => {
     setScriptsLoaded(true);
   };
+
+  useEffect(() => {
+    if (!scriptsLoaded) return;
+
+    const w = window as any;
+    const gsap = w.gsap;
+    const ScrollTrigger = w.ScrollTrigger;
+
+    // ── Preloader ──────────────────────────────────────────────────────────
+    const fill = document.getElementById('preloader-fill') as HTMLElement | null;
+    const preloader = document.getElementById('preloader') as HTMLElement | null;
+    // Always set a hard timeout fallback so preloader never gets stuck
+    const preloaderFallback = setTimeout(() => {
+      if (preloader) {
+        preloader.style.opacity = '0';
+        preloader.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => { if (preloader) preloader.style.display = 'none'; }, 500);
+      }
+    }, 2500);
+    if (fill && preloader && gsap) {
+      gsap.to(fill, {
+        width: '100%',
+        duration: 1.2,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          clearTimeout(preloaderFallback);
+          gsap.to(preloader, {
+            opacity: 0,
+            duration: 0.6,
+            delay: 0.2,
+            onComplete: () => { preloader.style.display = 'none'; },
+          });
+        },
+      });
+    } else if (preloader) {
+      // Fallback without GSAP
+      clearTimeout(preloaderFallback);
+      setTimeout(() => {
+        preloader.style.opacity = '0';
+        preloader.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => { preloader.style.display = 'none'; }, 500);
+      }, 1200);
+    }
+
+    if (!gsap) return;
+
+    // ── Register ScrollTrigger ─────────────────────────────────────────────
+    if (ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+
+    // ── Scroll progress bar ────────────────────────────────────────────────
+    const progressBar = document.getElementById('scroll-progress') as HTMLElement | null;
+    if (progressBar && ScrollTrigger) {
+      ScrollTrigger.create({
+        onUpdate: (self: any) => { progressBar.style.width = `${self.progress * 100}%`; },
+        start: 'top top',
+        end: 'max',
+      });
+    }
+
+    // ── Sticky nav shadow ──────────────────────────────────────────────────
+    const header = document.getElementById('main-header');
+    const onScroll = () => {
+      if (header) header.classList.toggle('shadow-lg', window.scrollY > 40);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── Custom cursor ──────────────────────────────────────────────────────
+    const dot = document.getElementById('cursor-dot') as HTMLElement | null;
+    const ring = document.getElementById('cursor-ring') as HTMLElement | null;
+    let mouseX = -100, mouseY = -100;
+    let ringX = -100, ringY = -100;
+    const moveCursor = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY; };
+    window.addEventListener('mousemove', moveCursor);
+    const animateCursor = () => {
+      if (dot) { dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%,-50%)`; }
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      if (ring) { ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%,-50%)`; }
+      requestAnimationFrame(animateCursor);
+    };
+    animateCursor();
+    document.querySelectorAll('a, button, [data-hover]').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+    // ── Particles ─────────────────────────────────────────────────────────
+    const container = document.getElementById('particles-container');
+    if (container) {
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'floating-particle';
+        const size = Math.random() * 3 + 1;
+        p.style.cssText = `width:${size}px;height:${size}px;background:${Math.random() > 0.5 ? '#7C5CFC' : '#22D3EE'};left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${Math.random()*0.4+0.1};`;
+        container.appendChild(p);
+        gsap.to(p, { y: `${(Math.random()-0.5)*200}`, x: `${(Math.random()-0.5)*100}`, duration: Math.random()*10+8, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: Math.random()*5 });
+      }
+    }
+
+    // ── Orbs mouse parallax ────────────────────────────────────────────────
+    const orbs = document.querySelectorAll('[data-orb]');
+    const moveOrbs = (e: MouseEvent) => {
+      const xFrac = (e.clientX / window.innerWidth - 0.5);
+      const yFrac = (e.clientY / window.innerHeight - 0.5);
+      orbs.forEach((orb, i) => {
+        const depth = (i + 1) * 18;
+        gsap.to(orb, { x: xFrac * depth, y: yFrac * depth, duration: 1.2, ease: 'power1.out' });
+      });
+    };
+    window.addEventListener('mousemove', moveOrbs);
+
+    // ── Hero animations ────────────────────────────────────────────────────
+    const tl = gsap.timeline({ delay: 1.6 });
+    const heroLine = document.querySelector('[data-hero-line]');
+    if (heroLine) tl.from(heroLine, { y: '110%', duration: 1.1, ease: 'expo.out' });
+    document.querySelectorAll('[data-hero-fade]').forEach((el, i) => {
+      tl.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, `-=${i === 0 ? 0.6 : 0.7}`);
+    });
+
+    // ── Scroll line animation ──────────────────────────────────────────────
+    const scrollLine = document.getElementById('scroll-line');
+    if (scrollLine && ScrollTrigger) {
+      gsap.from(scrollLine, { scaleY: 0, duration: 1.5, ease: 'power2.inOut', delay: 2.5 });
+    }
+
+    // ── Reveal-up on scroll ────────────────────────────────────────────────
+    if (ScrollTrigger) {
+      gsap.utils.toArray('.reveal-up').forEach((el: any) => {
+        gsap.from(el, {
+          y: 50, opacity: 0, duration: 0.9, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+        });
+      });
+
+      // Image reveal cover
+      gsap.utils.toArray('.img-reveal-cover').forEach((el: any) => {
+        gsap.to(el, {
+          scaleY: 0, duration: 1.2, ease: 'expo.inOut',
+          scrollTrigger: { trigger: el.parentElement, start: 'top 85%', once: true },
+        });
+      });
+
+      // Section headings
+      document.querySelectorAll('[data-split-heading]').forEach(el => {
+        gsap.from(el, {
+          y: 40, opacity: 0, duration: 1, ease: 'expo.out',
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        });
+      });
+
+      // Counters
+      document.querySelectorAll('[data-counter]').forEach(el => {
+        const target = parseInt((el as HTMLElement).dataset.target || '0', 10);
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => { gsap.to({ val: 0 }, { val: target, duration: 1.8, ease: 'power2.out', onUpdate: function() { el.textContent = Math.round(this.targets()[0].val).toString(); } }); },
+        });
+      });
+
+      // Timeline fill
+      const timelineFill = document.getElementById('timeline-fill');
+      if (timelineFill) {
+        gsap.to(timelineFill, {
+          height: '100%', ease: 'none',
+          scrollTrigger: { trigger: timelineFill, start: 'top 80%', end: 'bottom 20%', scrub: true },
+        });
+      }
+
+      // Parallax sections
+      document.querySelectorAll<HTMLElement>('[data-parallax-speed]').forEach(el => {
+        const speed = parseFloat(el.dataset.parallaxSpeed || '0.1');
+        gsap.to(el, {
+          y: () => -(el.parentElement!.offsetHeight * speed * 0.5),
+          ease: 'none',
+          scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+        });
+      });
+    }
+
+    // ── Typed.js ───────────────────────────────────────────────────────────
+    const Typed = w.Typed;
+    if (Typed) {
+      new Typed('#typed-output', {
+        strings: ['Backend Developer', 'Laravel Specialist', 'API Architect', 'Full-Stack Engineer'],
+        typeSpeed: 60, backSpeed: 35, backDelay: 1800, loop: true, showCursor: true, cursorChar: '|',
+      });
+    }
+
+    // ── Lenis smooth scroll ────────────────────────────────────────────────
+    const Lenis = w.Lenis;
+    if (Lenis) {
+      const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+      const rafLenis = (time: number) => { lenis.raf(time); requestAnimationFrame(rafLenis); };
+      requestAnimationFrame(rafLenis);
+      if (ScrollTrigger) lenis.on('scroll', ScrollTrigger.update);
+    }
+
+    // ── Swiper ────────────────────────────────────────────────────────────
+    const Swiper = w.Swiper;
+    if (Swiper) {
+      new Swiper('.project-swiper', {
+        slidesPerView: 1.1, centeredSlides: true, spaceBetween: 24,
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        grabCursor: true,
+        breakpoints: { 768: { slidesPerView: 1.5 }, 1024: { slidesPerView: 2.2 } },
+      });
+    }
+
+    // ── Marquee ────────────────────────────────────────────────────────────
+    const track = document.getElementById('marquee-track');
+    if (track && gsap) {
+      const width = track.scrollWidth / 2;
+      gsap.to(track, { x: -width, duration: 28, ease: 'none', repeat: -1, modifiers: { x: (x: string) => `${parseFloat(x) % width}px` } });
+    }
+
+    // ── Tilt cards ────────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLElement>('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+        gsap.to(card, { rotateY: x, rotateX: y, duration: 0.4, ease: 'power1.out' });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'elastic.out(1,0.5)' });
+      });
+    });
+
+    // ── Magnetic buttons ──────────────────────────────────────────────────
+    document.querySelectorAll<HTMLElement>('.magnetic').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.35;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.35;
+        gsap.to(btn, { x, y, duration: 0.4, ease: 'power1.out' });
+      });
+      btn.addEventListener('mouseleave', () => {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,0.5)' });
+      });
+    });
+
+    // ── Ripple effect ─────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLElement>('.ripple').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-el';
+        ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
+        btn.appendChild(ripple);
+        gsap.to(ripple, { scale: 1, opacity: 0, duration: 0.6, ease: 'power2.out', onComplete: () => ripple.remove() });
+      });
+    });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('mousemove', moveCursor);
+      window.removeEventListener('mousemove', moveOrbs);
+      if (ScrollTrigger) ScrollTrigger.killAll();
+    };
+  }, [scriptsLoaded]);
 
   return (
     <>
@@ -240,7 +504,7 @@ export default function HomeClient({ about, experiences, projects, skills, cv }:
         </div>
 
         <h1 className="relative z-10 font-display font-bold text-[13vw] md:text-[7.2vw] leading-[0.95] tracking-tight" id="hero-heading">
-          <div className="char-wrap"><span className="char glitch-text" id="hero-name" data-hero-line data-scramble>Ahamed Aboo Adnan</span></div>
+          <div className="char-wrap"><span className="char glitch-text" id="hero-name" data-hero-line data-scramble>{about?.name || 'Ahamed Aboo Adnan'}</span></div>
         </h1>
 
         <div className="relative z-10 mt-8 max-w-2xl opacity-0" data-hero-fade>
@@ -254,11 +518,11 @@ export default function HomeClient({ about, experiences, projects, skills, cv }:
 
         <div className="relative z-10 mt-10 flex flex-wrap items-center gap-5 opacity-0" data-hero-fade>
           {cv ? (
-            <a href={cv.file_path} download={cv.original_name} className="magnetic ripple inline-flex items-center gap-2 bg-paper text-ink font-medium px-7 py-3.5 rounded-full text-sm">
+            <a href={cv.file_path} download={cv.original_name} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] text-[#0B0B0B] font-medium px-7 py-3.5 rounded-full text-sm">
               <span>Download CV</span><i className="bx bx-download"></i>
             </a>
           ) : (
-            <button onClick={() => alert('CV not uploaded yet.')} className="magnetic ripple inline-flex items-center gap-2 bg-paper text-ink font-medium px-7 py-3.5 rounded-full text-sm">
+            <button onClick={() => alert('CV not uploaded yet.')} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] text-[#0B0B0B] font-medium px-7 py-3.5 rounded-full text-sm">
               <span>Download CV</span><i className="bx bx-download"></i>
             </button>
           )}
@@ -484,7 +748,6 @@ export default function HomeClient({ about, experiences, projects, skills, cv }:
       </footer>
 
       {/* ===== INIT SCRIPTS REMOVED - MOVED TO USEEFFECT ===== */}
-      `}</Script>
     </>
   );
 }
