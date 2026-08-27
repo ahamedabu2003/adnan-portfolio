@@ -518,12 +518,12 @@ export default function HomeClient({ about, experiences, projects, skills, cv }:
 
         <div className="relative z-10 mt-10 flex flex-wrap items-center gap-5 opacity-0" data-hero-fade>
           {cv ? (
-            <a href={cv.file_path} download={cv.original_name} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] text-[#0B0B0B] font-medium px-7 py-3.5 rounded-full text-sm">
-              <span>Download CV</span><i className="bx bx-download"></i>
+            <a href={cv.file_path} download={cv.original_name} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] font-medium px-7 py-3.5 rounded-full text-sm" style={{ color: '#0B0B0B', backgroundColor: '#F5F5F7' }}>
+              <span style={{ color: '#0B0B0B' }}>Download CV</span><i className="bx bx-download" style={{ color: '#0B0B0B' }}></i>
             </a>
           ) : (
-            <button onClick={() => alert('CV not uploaded yet.')} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] text-[#0B0B0B] font-medium px-7 py-3.5 rounded-full text-sm">
-              <span>Download CV</span><i className="bx bx-download"></i>
+            <button onClick={() => alert('CV not uploaded yet.')} className="magnetic ripple inline-flex items-center gap-2 bg-[#F5F5F7] font-medium px-7 py-3.5 rounded-full text-sm" style={{ color: '#0B0B0B', backgroundColor: '#F5F5F7' }}>
+              <span style={{ color: '#0B0B0B' }}>Download CV</span><i className="bx bx-download" style={{ color: '#0B0B0B' }}></i>
             </button>
           )}
           <a href="#contact" className="magnetic ripple border inline-flex items-center gap-2 border border-white/20 px-7 py-3.5 rounded-full text-sm hover:border-signal/60 transition-colors">
