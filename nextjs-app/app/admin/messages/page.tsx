@@ -22,14 +22,14 @@ export default function AdminMessages() {
     fetchMessages();
   }, []);
 
-  const fetchMessages = () => {
+  function fetchMessages() {
     fetch('/api/admin/messages')
       .then((res) => res.json())
       .then((data) => {
         setMessages(data || []);
         setLoading(false);
       });
-  };
+  }
 
   const handleOpenMessage = async (msg: ContactMessage) => {
     setSelectedMsg(msg);

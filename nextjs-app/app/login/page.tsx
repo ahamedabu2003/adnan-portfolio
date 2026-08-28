@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (status === 'authenticated' && (session?.user as any)?.is_admin) {
+    if (status === 'authenticated' && (session?.user as { is_admin?: boolean })?.is_admin) {
       router.push('/admin');
     }
   }, [status, session, router]);
@@ -47,9 +48,9 @@ export default function LoginPage() {
 
         <div className="relative z-10 w-full max-w-md">
           <div className="text-center mb-10">
-            <a href="/" className="inline-block font-bold text-3xl tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <Link href="/" className="inline-block font-bold text-3xl tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               AA<span className="gradient-animate">.</span>dev
-            </a>
+            </Link>
             <p className="text-[#8A8A93] text-sm mt-3 tracking-wide">Admin Portal</p>
           </div>
 
@@ -83,7 +84,7 @@ export default function LoginPage() {
             </form>
           </div>
           <p className="text-center text-xs text-[#8A8A93] mt-6">
-            <a href="/" className="hover:text-white transition-colors">← Back to Portfolio</a>
+            <Link href="/" className="hover:text-white transition-colors">← Back to Portfolio</Link>
           </p>
         </div>
       </div>

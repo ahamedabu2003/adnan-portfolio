@@ -22,14 +22,14 @@ export default function AdminSkills() {
     fetchSkills();
   }, []);
 
-  const fetchSkills = () => {
+  function fetchSkills() {
     fetch('/api/admin/skills')
       .then((res) => res.json())
       .then((data) => {
         setSkills(data || []);
         setLoading(false);
       });
-  };
+  }
 
   const openAddModal = () => {
     setEditingSkill(null);

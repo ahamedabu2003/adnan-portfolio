@@ -31,14 +31,14 @@ export default function AdminProjects() {
     fetchProjects();
   }, []);
 
-  const fetchProjects = () => {
+  function fetchProjects() {
     fetch('/api/admin/projects')
       .then((res) => res.json())
       .then((data) => {
         setProjects(data || []);
         setLoading(false);
       });
-  };
+  }
 
   const openAddModal = () => {
     setEditingProject(null);
