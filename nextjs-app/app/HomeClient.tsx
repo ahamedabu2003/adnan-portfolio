@@ -2007,7 +2007,7 @@ export default function HomeClient({
         <div className="loader-bar">
           <div id="preloader-fill" />
         </div>
-        <div className="loader-copy">booting portfolio / 2026</div>
+        <div className="loader-copy">CONNECTING TO THE CREATIVE CORE / 2026</div>
       </div>
 
       {/* NAV */}
