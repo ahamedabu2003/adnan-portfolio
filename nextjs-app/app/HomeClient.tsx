@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
+import RetroGame from './RetroGame';
+import UiSfx from './UiSfx';
 
 interface About {
   _id: string;
@@ -2590,6 +2592,8 @@ export default function HomeClient({
       </footer>
 
       {toast && <div className="toast">{toast}</div>}
+      <RetroGame />
+      <UiSfx />
     </div>
   );
 }
