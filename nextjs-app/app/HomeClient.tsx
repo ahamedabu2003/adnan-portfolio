@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
-import RetroGame from './RetroGame';
 import UiSfx from './UiSfx';
 
 interface About {
@@ -2587,12 +2586,11 @@ export default function HomeClient({
             system.status = 200 OK
           </span>
 
-          <span>Built with Next.js + GSAP</span>
+          <span>Built by {heroName}</span>
         </div>
       </footer>
 
       {toast && <div className="toast">{toast}</div>}
-      <RetroGame />
       <UiSfx />
     </div>
   );

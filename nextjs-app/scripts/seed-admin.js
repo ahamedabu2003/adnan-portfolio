@@ -17,8 +17,8 @@ if (fs.existsSync(envPath)) {
 
 const adminUser = {
   name: 'Ahamed Aboo Adnan',
-  email: 'admin@example.com',
-  password: 'adminpassword123', // Raw password to be hashed
+  email: 'ahamed@gmail.com',
+  password: 'Adnan@2003', // Raw password to be hashed
   is_admin: true,
 };
 
